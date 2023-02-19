@@ -30,12 +30,9 @@ class ScrapingCovid19():
             sleep(3)
             soup = BeautifulSoup(self.browser.page_source, 'html.parser')
             tabela = soup.find("table", id="totalContent-table")
-            colunas =  list(map(lambda tag: tag.get_text(), tabela.find_all("th")))
-            bloco_de_linhas = tabela.find_all("tr") #list(map(lambda tag: tag, tabela.find_all("tr")))
+            bloco_de_linhas = tabela.find_all("tr")
             lista_de_dados = self.__coletar_dados_da_tabela(bloco_de_linhas[1:])
-            #print(lista_de_dados)
-            #print(list({coluna: dado for coluna, dado in zip(colunas, lista_de_dados)}))
-            print(self.__lista_de_dict_covid(colunas, lista_de_dados))
+            return self. __lista_de_informacoes_covid(lista_de_dados))
         except Exception as e:
             print(e)
     
@@ -47,15 +44,28 @@ class ScrapingCovid19():
                 )
             return lista_dados_por_linha
     
-    def __lista_de_dict_covid(self, colunas, lista_de_dados):
+    def __lista_de_informacoes_covid(self, lista_de_dados: list) -> list:
         lista_de_dict = []
         for dado in lista_de_dados:
-            print(dado)
-            #lista_de_dict.append({coluna: dado})
-        #return lista_de_dict
+            lista_de_dict.append({"Estado": dado[0],
+            "Total	Min. da Saúde (MS)": dado[1],
+            "Diferença": dado[2],
+            "Óbitos	Óbitos (MS)": dado[3],
+            "URL": dado[4],
+            "Óbitos por 100k": dado[5],
+            "Casos por 100k": dado[6],
+            "Óbitos/Casos": dado[7],
+            "Recuperados": dado[8],
+            "Novos casos": dado[9],
+            "Novos óbitos": dado[10],
+            "Novos Casos": dado[11],
+            "Novas Mortes": dado[12]
+            }.copy())
+        return lista_de_dict
     
     def gerar_csv(self) -> None:
-        self.extrair_dados_covid19()
+        pass        
+        #self.extrair_dados_covid19()
                 
 
 covid = ScrapingCovid19()
