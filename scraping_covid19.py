@@ -21,7 +21,12 @@ class ScrapingCovid19():
         self.browser = Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install(), options=chrome_options)
         self.browser.get(self.url)
 
-    def extrair_dados_covid19(self) -> dict:
+    def extrair_dados_covid(self) -> dict:
+        """ Todo processo de extração dos dados da covid-19
+            
+            Returns:
+            list: dicionários com informações da covid-19.        
+        """
         try:
             sleep(3)
             print("COLETANDO OS DADOS, AGUARDE ...")
@@ -32,11 +37,16 @@ class ScrapingCovid19():
             tabela = soup.find("table", id="totalContent-table")
             bloco_de_linhas = tabela.find_all("tr")
             lista_de_dados = self.__coletar_dados_da_tabela(bloco_de_linhas[1:])
-            return self. __lista_de_informacoes_covid(lista_de_dados))
+            return self. __lista_de_informacoes_covid(lista_de_dados)
         except Exception as e:
             print(e)
     
     def __coletar_dados_da_tabela(self, lista_de_dados: list) -> list:
+            """ Extração dos dados contidos na tag relacionada.
+            
+            Returns:
+            list: lista das listas de dados coletados.
+            """
             lista_dados_por_linha = []
             for linha in lista_de_dados:
                 lista_dados_por_linha.append(
@@ -45,31 +55,44 @@ class ScrapingCovid19():
             return lista_dados_por_linha
     
     def __lista_de_informacoes_covid(self, lista_de_dados: list) -> list:
+        """ Retornar lista de dicionários das informações coletadas.
+            
+            Parameters:
+            lista_de_dados(list): lista contendo as listas com os
+            dados de acordos com as linhas das tabelas.                        
+
+            
+            Returns:
+            list: dicionários com informações da covid-19.        
+        """
         lista_de_dict = []
         for dado in lista_de_dados:
             lista_de_dict.append({"Estado": dado[0],
-            "Total	Min. da Saúde (MS)": dado[1],
-            "Diferença": dado[2],
-            "Óbitos	Óbitos (MS)": dado[3],
-            "URL": dado[4],
-            "Óbitos por 100k": dado[5],
-            "Casos por 100k": dado[6],
-            "Óbitos/Casos": dado[7],
-            "Recuperados": dado[8],
-            "Novos casos": dado[9],
-            "Novos óbitos": dado[10],
-            "Novos Casos": dado[11],
-            "Novas Mortes": dado[12]
+            "Total": dado[1],
+            "Min. da Saúde (MS)": dado[2],
+            "Diferença": dado[3],
+            "Óbitos": dado[4],
+            "Óbitos (MS)": dado[5],
+            "Óbitos por 100k": dado[7],
+            "Casos por 100k": dado[8],
+            "Óbitos/Casos": dado[9],
+            "Recuperados": dado[10],
+            "Novos casos": dado[11],
+            "Novos óbitos": dado[12],
+            "Novos Casos": dado[13],
+            "Novas Mortes": dado[14]
             }.copy())
         return lista_de_dict
+                 
     
     def gerar_csv(self) -> None:
-        pass        
-        #self.extrair_dados_covid19()
+        """Gerar arquivo csv com os dados coletados."""
+        todas_as_informacoes_covid = self.extrair_dados_covid()
+        df_tratado = pd.DataFrame(todas_as_informacoes_covid)
+        df_tratado.to_csv("dados_covid19.csv", index=False, sep=";")
+        print("CSV COM OS DADOS FOI GERADO.")       
                 
 
 covid = ScrapingCovid19()
-covid.extrair_dados_covid19()
-#covid.gerar_csv()
-
+covid.gerar_csv()
 
